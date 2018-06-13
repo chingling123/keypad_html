@@ -1,0 +1,135 @@
+/*
+ * !! ATTENTION
+ * responsive heights set using
+ * the new vh css units based on
+ * viewport dimensions - will most likely
+ * break layout in out-of-date browsers
+ */
+html {
+  background: black;
+  overflow: hidden;
+  cursor:none;
+}
+
+body {
+  overflow: hidden;
+  cursor:none;
+}
+
+#mynumber {
+  background: #000;
+  border: none;
+  /* box-shadow: inset 0 1px 0 rgba(255,255,255,0.2); */
+  margin: 10px 10px 0;
+  box-sizing: border-box;
+  padding: 10px 30px;
+  font-size: 14vh;
+  color: #fff;
+  text-align: right;
+  width: calc(100% - 25px);
+  height: 17vh;
+  direction: rtl;
+  cursor: none;
+  border-radius: 25px; 
+ }
+
+.container {
+	width: 100vw;	
+}
+
+.keypad {
+  width: calc(100% - 15px);
+  padding: 0;
+}
+
+ul {
+  list-style-type: none;
+}
+
+.press {
+  display: inline-block;
+  width: calc(33.33% - 28px);
+  margin: 0 10px 10px;
+}
+
+.clearfix {
+  clear: both;
+}
+
+.button {
+  width: 100%;
+  display: inline-block;
+  background: #f3f3f4;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.2),0 2px 2px rgba(0,0,0,0.4);
+  /* border: 1px solid #6e7072; */
+  padding: 5px;
+  cursor:none;
+  border-radius: 25px;
+}
+
+/* .button:hover, 
+.button:active,
+.button:hover
+{
+  background: linear-gradient(#7a7a7a, #5c5c5c);
+} */
+
+.button.clear {
+  /* background: linear-gradient(#673737, #502020); */
+  background: #9b0606;
+}
+
+/* .button.clear:hover, 
+.button.clear:active,
+.button.clear:hover
+  {
+  background: linear-gradient(#815151, #742a2a);
+} */
+
+.button.go {
+  /* background: linear-gradient(#425c51, #223720); */
+  background: #0a7b2b;
+}
+
+/* .button.go:hover, 
+.button.go:active,
+.button.go:hover
+  {
+  background: linear-gradient(#51816d, #125424);
+} */
+
+.press.nr {
+  width: 100%;
+}
+
+.number {
+  text-align: center;
+  margin: 0 !important;
+  color: #000;
+  /* text-shadow: 1px 1px #000; */
+  font-family: "Helvetica", sans-serif;
+  font-size: 10vh;
+  font-weight: bold;
+  line-height: 14.1vh;
+  min-height: 14vh;
+}
+
+.number.clear, .number.go {
+  font-size: 7.5vh;
+  color:white; 
+}
+
+/* .number.clear{
+  border: 1px solid #7a0505;
+  border-radius: 25px;
+}
+
+.number.go {
+  border: 1px solid #06661b;
+  border-radius: 25px;
+} */
+
+::placeholder{
+  color:white;
+  opacity: 1;
+}
