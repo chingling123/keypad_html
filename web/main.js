@@ -11,24 +11,16 @@ $(".press").bind('touchstart click', function(event) {
       flag = false;
     }, 100);
     event.preventDefault();
-    console.log("clicked");
     var input = $(this).attr('id');
-    console.log("this: " + input);
     var existing = $("#mynumber").val();
     var result;
     if (input == "GO") {
-      /* do something with         
-       * $("#mynumber").val();
-       */
-      console.log($("#mynumber").val());
+       console.log(eel.check_cpf($("#mynumber").val()));
     } else if (input == "DEL") {
       result = existing.slice(0,-1);
       $("#mynumber").val(result);
-      console.log("delete");
     } else {
-      console.log(input);
       existing = $("#mynumber").val();
-      console.log(existing);
       result = existing + input;
       $("#mynumber").val(result);
       try {

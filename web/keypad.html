@@ -1,8 +1,8 @@
 <html>
     <head>
         <link href="style.css" rel="stylesheet">
-                <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script> 
-                <script src="https://igorescobar.github.io/jQuery-Mask-Plugin/js/jquery.mask.min.js"></script> 
+        <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script> 
+        <script src="https://igorescobar.github.io/jQuery-Mask-Plugin/js/jquery.mask.min.js"></script> 
     </head>
     <body>
         <div class="result">
@@ -84,6 +84,51 @@
                 </a>
             </ul>
         </div>
-        <script src="main.js"></script>
+        <script type="text/javascript" src="/eel.js"></script>
+	<script type="text/javascript">
+		eel.expose(python_errors);
+		function python_errors(erro){
+			if(!erro){
+			 $('#mynumber').val('CPF INVALIDO')
+			}else{
+			 $('#mynumber').val('CPF VALIDO')
+			}
+	        }
+
+        $('input').mousedown(function(e){
+        e.preventDefault();
+        $(this).blur();
+        return false;
+        });
+        var flag = false;
+        $(".press").bind('touchstart click', function(event) {
+        if (!flag) {
+            flag = true;
+            setTimeout(function() {
+            flag = false;
+            }, 100);
+            event.preventDefault();
+            var input = $(this).attr('id');
+            var existing = $("#mynumber").val();
+            var result;
+            if (input == "GO") {
+            console.log(eel.check_cpf($("#mynumber").val()));
+            } else if (input == "DEL") {
+            result = existing.slice(0,-1);
+            $("#mynumber").val(result);
+            } else {
+            existing = $("#mynumber").val();
+            result = existing + input;
+            $("#mynumber").val(result);
+            try {
+                $("#mynumber").unmask();
+            } catch (e) {}
+            $("#mynumber").mask("999.999.999-99");
+            }
+        }
+
+        return false
+        });
+	</script>
         </body>
 </html>

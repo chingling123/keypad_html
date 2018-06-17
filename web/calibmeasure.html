@@ -1,0 +1,48 @@
+<html>
+	<head>
+        <script type="text/javascript" src="/eel.js"></script>
+        <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+	<head>
+	<body>
+		<h1>Measuring Calibration</h1>
+		<h3>Place a knowing weight</h3>
+		<button onClick="startListening();">Get Weight</button>
+        <button onClick="tare();">Tare</button>
+        <h1 id="weight">Weight: </h1>
+        <h2>Knowing weight</h2><input type="text" id="measure"/>
+        <button onClick="themath();">Set Config</button>
+        <script type="text/javascript">
+            //var startInterval = 0;
+            var tmpWeight = 0;
+            function themath(){
+                let measure = parseInt($("#measure").val())
+                console.log(tmpWeight)
+                console.log(measure)
+                console.log(tmpWeight / measure)
+                eel.write_config_measuring(tmpWeight / measure)
+            }
+
+            function tare(){
+               // console.log(startInterval)
+               // clearInterval(startInterval)
+                $("#weight").html("Weight: ")
+                eel.set_config_measuring()
+            }
+
+            function startListening(){
+                eel.getWeight()
+               // clearInterval(startInterval)
+               // startInterval = setInterval(()=>{
+               //     console.log(eel.getWeight())
+               // }, 100)
+            }
+
+            eel.expose(get_weight)
+            function get_weight(w){
+                console.log(w)
+                tmpWeight = w
+               $("#weight").html("Weight: " + tmpWeight)
+            }
+        </script>
+	</body>
+</html>
