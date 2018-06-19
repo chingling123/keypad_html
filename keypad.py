@@ -3,6 +3,8 @@ import RPi.GPIO as GPIO
 import argparse
 import eel
 import json
+import time
+from motors import Motors
 from pycpfcnpj import cpfcnpj
 from hx711 import HX711
 
@@ -19,13 +21,40 @@ parser.add_argument('--startup', metavar='Startup Type', nargs='?', default='N',
 
 args = parser.parse_args()
 
+mo = Motors([0x11,0x12,0x13,0x14,0x15])
+
 eel.init('web')
+
+def start_motor():
+    mo.start_motor()
+
+    start_time = time.time()
+    elapsed_time = 0
+
+    while mo.read_motor_info() != 0X01:
+        elapsed_time = time.time() - start_time
+        if elapsed_time > 10:
+            break
+     
+        print 'reading... ' + str(mo.motorCount)
+        mo.set_status_sensor()
+        print  mo.get_actual_status()
+        mo.set_status_reset()
+        time.sleep(1)
+
+    print 'laps'
+    mo.set_status_counter()
+    print mo.get_actual_status()
+
 
 @eel.expose
 def check_cpf(cpf):
     try:
-        print(cpfcnpj.validate(cpf))
-        eel.python_errors(cpfcnpj.validate(cpf))
+        test = cpfcnpj.validate(cpf)
+        print(test)
+        eel.python_errors(test)
+        if test == True:
+            start_motor()
     except:
         eel.python_errors('Exception')
 
