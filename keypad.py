@@ -25,9 +25,25 @@ mo = Motors([0x11,0x12,0x13,0x14,0x15])
 
 eel.init('web')
 
-def start_motor():
+def check_motor():
+    print(mo.motorCount)
     mo.start_motor()
+    time.sleep(0.5)
 
+    if mo.read_motor_info() == 0x00:
+        mo.add_counter()
+        if mo.motorCount < 5:
+            check_motor()
+        else:
+            time.sleep(0.5)
+            eel.python_alert("Motores Com Problema")
+    else:
+        start_motor()
+
+
+def start_motor():
+    
+    print('out check motor')
     start_time = time.time()
     elapsed_time = 0
 
@@ -36,25 +52,27 @@ def start_motor():
         if elapsed_time > 10:
             break
      
-        print 'reading... ' + str(mo.motorCount)
+        print('reading... ' + str(mo.motorCount))
         mo.set_status_sensor()
-        print  mo.get_actual_status()
+        print(mo.get_actual_status())
         mo.set_status_reset()
         time.sleep(1)
 
-    print 'laps'
+    print('laps')
     mo.set_status_counter()
-    print mo.get_actual_status()
+    print(mo.get_actual_status())
 
 
 @eel.expose
 def check_cpf(cpf):
     try:
+        print('check_cpf')
         test = cpfcnpj.validate(cpf)
         print(test)
-        eel.python_errors(test)
+        
         if test == True:
-            start_motor()
+            eel.python_errors(test)
+            check_motor()
     except:
         eel.python_errors('Exception')
 

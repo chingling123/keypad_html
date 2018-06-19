@@ -86,14 +86,21 @@
         </div>
         <script type="text/javascript" src="/eel.js"></script>
 	<script type="text/javascript">
+        eel.expose(python_alert);
+        function python_alert(msg){
+            console.log(msg)
+            $('#mynumber').val(msg)
+        }
+        
 		eel.expose(python_errors);
 		function python_errors(erro){
+            console.log('python_errors')
 			if(!erro){
 			 $('#mynumber').val('CPF INVALIDO')
 			}else{
 			 $('#mynumber').val('CPF VALIDO')
 			}
-	        }
+	    }
 
         $('input').mousedown(function(e){
         e.preventDefault();
@@ -112,7 +119,8 @@
             var existing = $("#mynumber").val();
             var result;
             if (input == "GO") {
-            console.log(eel.check_cpf($("#mynumber").val()));
+                console.log('go')
+                eel.check_cpf($("#mynumber").val());
             } else if (input == "DEL") {
             result = existing.slice(0,-1);
             $("#mynumber").val(result);
