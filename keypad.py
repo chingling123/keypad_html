@@ -23,26 +23,43 @@ args = parser.parse_args()
 
 mo = Motors([0x11,0x12,0x13,0x14,0x15])
 
+GPIO.setup(22, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+
+def gpio_callback(channel):
+    global dropped
+    global dropatempt
+    dropped = True
+    dropatempt = 0
+    print "falling " + str(channel)
+
+
+GPIO.add_event_detect(22, GPIO.FALLING, callback=gpio_callback, bouncetime=50)
+
+dropped = False
+dropatempt = 0
+
 eel.init('web')
+
+print len(mo.motors)
 
 def check_motor():
     print(mo.motorCount)
+    print("motor info " + str(mo.read_motor_info()))
     mo.start_motor()
-    time.sleep(0.5)
+    print("motor info " + str(mo.read_motor_info()))
 
-    if mo.read_motor_info() == 0x00:
+    if mo.read_motor_info() == 0x01:
         mo.add_counter()
         if mo.motorCount < 5:
             check_motor()
         else:
-            time.sleep(0.5)
             eel.python_alert("Motores Com Problema")
     else:
         start_motor()
 
 
 def start_motor():
-    
+    global dropatempt
     print('out check motor')
     start_time = time.time()
     elapsed_time = 0
@@ -62,15 +79,28 @@ def start_motor():
     mo.set_status_counter()
     print(mo.get_actual_status())
 
+    time.sleep(0.5)
+    if dropped == False and dropatempt < 1:
+        dropatempt += 1
+        check_motor()
+    elif dropped == False and dropatempt == 1:
+        mo.add_counter()
+        dropatempt = 0
+        check_motor()
+
 
 @eel.expose
 def check_cpf(cpf):
     try:
+        global dropatempt
+        global dropped
         print('check_cpf')
         test = cpfcnpj.validate(cpf)
         print(test)
         
         if test == True:
+            dropatempt = 0
+            dropped = False
             eel.python_errors(test)
             check_motor()
     except:

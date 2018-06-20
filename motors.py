@@ -1,6 +1,7 @@
 from smbus2 import SMBus
 
 class Motors:
+    
     def __init__(self, motorsList):
         self.motors = motorsList
         self.motorCount = 0
@@ -11,7 +12,7 @@ class Motors:
            self.bus.write_byte(self.motors[self.motorCount], 0x01)
             
     def add_counter(self):
-        if self.motorCount < self.motors.count:
+        if self.motorCount < len(self.motors)-1:
             self.motorCount += 1
         else:
             self.motorCount = 0
