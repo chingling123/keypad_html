@@ -1,17 +1,16 @@
+import threading
 import atexit
 import RPi.GPIO as GPIO
 import argparse
 import eel
 import json
 import time
+import datetime
 from motors import Motors
 from pycpfcnpj import cpfcnpj
 from hx711 import HX711
-
-def cleanup():
-    GPIO.cleanup()
-
-atexit.register(cleanup)
+from pyzabbix import ZabbixMetric, ZabbixSender
+from google.cloud import firestore
 
 hx = HX711(5,6)
 hx.set_reading_format("LSB", "MSB")
@@ -23,6 +22,8 @@ args = parser.parse_args()
 
 mo = Motors([0x11,0x12,0x13,0x14,0x15])
 
+GPIO.setmode(GPIO.BCM)
+
 GPIO.setup(22, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 def gpio_callback(channel):
@@ -31,6 +32,7 @@ def gpio_callback(channel):
     dropped = True
     dropatempt = 0
     print "falling " + str(channel)
+    threading.Thread(target=send_zabbix, args=(), kwargs={}).start()
 
 
 GPIO.add_event_detect(22, GPIO.FALLING, callback=gpio_callback, bouncetime=50)
@@ -40,7 +42,26 @@ dropatempt = 0
 
 eel.init('web')
 
-print len(mo.motors)
+db = firestore.Client()
+
+def cleanup():
+    GPIO.cleanup()
+
+atexit.register(cleanup)
+
+def send_zabbix():
+    packet = [
+        ZabbixMetric('raspberrypi', 'interacao.ativo', 1)
+    ]
+    result = ZabbixSender(zabbix_server='zabbix-srv.brazilsouth.cloudapp.azure.com',zabbix_port=10051,use_config=None).send(packet)
+    print result
+
+    doc_ref = db.collection('projects/zseudNoiMvMk5hqe8XDK/projectData').document()
+    doc_ref.set({
+        'create_at': datetime.datetime.now(),
+        'motor': mo.motorCount
+    })
+
 
 def check_motor():
     print(mo.motorCount)
@@ -97,19 +118,21 @@ def check_cpf(cpf):
         print('check_cpf')
         test = cpfcnpj.validate(cpf)
         print(test)
+
+        eel.python_errors(test)
         
         if test == True:
             dropatempt = 0
             dropped = False
-            eel.python_errors(test)
             check_motor()
+            
     except:
         eel.python_errors('Exception')
 
-def tare():
-    print("tare")
-    hx.reset()
-    hx.tare()
+#def tare():
+#    print("tare")
+#    hx.reset()
+#    hx.tare()
 
 @eel.expose
 def getWeight():
@@ -122,8 +145,8 @@ def set_config_measuring():
     file = open("config.cfg","r")
     data = json.loads(file.read())
     print(data["measuring"])
-    hx.set_reference_unit(data["measuring"])
-    tare()
+#    hx.set_reference_unit(data["measuring"])
+#    tare()
 
 @eel.expose
 def write_config_measuring(w):
@@ -136,9 +159,10 @@ def write_config_measuring(w):
     with open("config.cfg", "w") as outfile:
         json.dump(data, outfile)
 
+
 set_config_measuring()
 
 if args.startup == 'N':
-    eel.start('keypad.html')
+   eel.start('keypad.html')
 elif args.startup == 'C':
     eel.start('calibmeasure.html')
